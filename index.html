@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TaxLab India — ITR & GST Practice Simulator</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--primary:#4f46e5;--primary2:#7c3aed;--line:#e5e7eb;--good:#16803c;--bad:#c62828;--shadow:0 12px 35px #17203312}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+header{background:linear-gradient(135deg,#171c3b,#4f46e5 55%,#7c3aed);color:#fff;padding:22px 5%;position:sticky;top:0;z-index:20;box-shadow:0 8px 25px #11182725}
+.nav{max-width:1250px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-size:22px;font-weight:800}.brand span{opacity:.7;font-weight:500;font-size:12px;display:block}
+.nav button{background:#ffffff18;border:1px solid #ffffff30;color:#fff;padding:9px 13px;border-radius:10px}
+.container{max-width:1250px;margin:28px auto;padding:0 18px}.hero{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:var(--shadow);display:flex;justify-content:space-between;gap:25px;align-items:center}
+h1{margin:0 0 8px;font-size:32px}.hero p{color:var(--muted);margin:0;line-height:1.6}.notice{margin-top:15px;background:#fff7df;border:1px solid #f5d477;padding:12px 14px;border-radius:12px;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin:18px 0}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}.stat b{font-size:27px;display:block}.stat small{color:var(--muted)}
+.tabs{display:flex;gap:8px;overflow:auto;margin:20px 0}.tab{border:1px solid var(--line);background:#fff;padding:11px 15px;border-radius:12px;white-space:nowrap}.tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow)}.panel.active{display:block}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.field label{display:block;font-weight:650;font-size:13px;margin-bottom:7px}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border:1px solid #d5d9e2;border-radius:10px;outline:none;background:#fff}.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px #4f46e51a}
+.full{grid-column:1/-1}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.primary,.secondary,.danger{border:0;border-radius:10px;padding:11px 15px}.primary{background:var(--primary);color:#fff}.secondary{background:#eef0ff;color:#3730a3}.danger{background:#feecec;color:#b42318}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.section-title h2{margin:0}.hint{color:var(--muted);font-size:13px}
+.result{margin-top:18px;padding:16px;border-radius:13px;background:#f7f8fc;border:1px solid var(--line)}.success{border-color:#a7e1bc;background:#effbf3;color:#176b36}.error{border-color:#f2b4b4;background:#fff3f3;color:#9f2424}
+.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:13px}.table th{background:#f8f9fc}
+.badge{display:inline-block;padding:4px 8px;border-radius:99px;background:#eef0ff;color:#3730a3;font-size:11px;font-weight:700}.question{border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}.question p{font-weight:700}.question label{display:block;margin:9px 0;color:#4b5563}
+.progress{height:10px;background:#eceef4;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,#4f46e5,#8b5cf6);width:0}
+footer{text-align:center;color:var(--muted);padding:35px 15px;font-size:12px}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.hero{display:block}.formgrid{grid-template-columns:1fr}}
+@media(max-width:520px){h1{font-size:25px}.grid{grid-template-columns:1fr 1fr}.container{padding:0 10px}.panel{padding:15px}}
+</style>
+</head>
+<body>
+<header><div class="nav"><div class="brand">TaxLab India <span>Practice • Learn • Simulate</span></div><button onclick="resetAll()">Reset Progress</button></div></header>
+<main class="container">
+<section class="hero">
+<div><h1>ITR & GST Practice Simulator</h1><p>Learn Indian tax-form workflows through a safe offline practice environment. Fill sample ITR data, simulate GST registration, validate sample GSTINs, create GST invoices and test your knowledge.</p>
+<div class="notice">⚠️ Educational simulator only — it does not submit returns, create a real GSTIN, or connect to the Income Tax/GST portals.</div></div>
+</section>
+
+<div class="grid">
+<div class="stat"><b id="completed">0</b><small>Modules completed</small></div>
+<div class="stat"><b id="score">0%</b><small>Quiz score</small></div>
+<div class="stat"><b id="invoices">0</b><small>Practice invoices</small></div>
+<div class="stat"><b id="gstins">0</b><small>GSTIN checks</small></div>
+</div>
+
+<div class="tabs">
+<button class="tab active" onclick="showTab('dashboard',this)">Dashboard</button>
+<button class="tab" onclick="showTab('itr',this)">ITR Practice</button>
+<button class="tab" onclick="showTab('gstreg',this)">GST Registration</button>
+<button class="tab" onclick="showTab('gstin',this)">GSTIN Checker</button>
+<button class="tab" onclick="showTab('invoice',this)">GST Invoice</button>
+<button class="tab" onclick="showTab('quiz',this)">Tax Quiz</button>
+<button class="tab" onclick="showTab('history',this)">History</button>
+</div>
+
+<section id="dashboard" class="panel active">
+<div class="section-title"><h2>Learning Dashboard</h2><span class="badge">Offline Practice</span></div>
+<p class="hint">Complete each simulator once. Your progress is saved in this browser.</p>
+<div style="margin:18px 0"><div class="progress"><i id="bar"></i></div></div>
+<div class="tablewrap"><table class="table"><tr><th>Module</th><th>What you practise</th><th>Status</th></tr>
+<tr><td>ITR Practice</td><td>Personal details, income, deductions, tax calculation</td><td id="sitr">Not started</td></tr>
+<tr><td>GST Registration</td><td>Business details, address, PAN, bank details</td><td id="sgst">Not started</td></tr>
+<tr><td>GSTIN Checker</td><td>GSTIN format and checksum-style practice</td><td id="sgstin">Not started</td></tr>
+<tr><td>GST Invoice</td><td>Taxable value, CGST/SGST/IGST and total</td><td id="sinvoice">Not started</td></tr>
+<tr><td>Tax Quiz</td><td>Basic ITR and GST concepts</td><td id="squiz">Not started</td></tr>
+</table></div>
+</section>
+
+<section id="itr" class="panel">
+<div class="section-title"><h2>ITR Filing Practice</h2><span class="hint">Sample data only</span></div>
+<div class="formgrid">
+<div class="field"><label>Assessment Year</label><select id="ay"><option>2026-27</option><option>2025-26</option><option>2024-25</option></select></div>
+<div class="field"><label>ITR Form</label><select id="itrform"><option>ITR-1 (Practice)</option><option>ITR-2 (Practice)</option><option>ITR-3 (Practice)</option></select></div>
+<div class="field"><label>Full Name</label><input id="name" placeholder="Sample Taxpayer"></div>
+<div class="field"><label>PAN (sample)</label><input id="pan" placeholder="ABCDE1234F" maxlength="10"></div>
+<div class="field"><label>Salary Income (₹)</label><input id="salary" type="number" min="0" value="500000"></div>
+<div class="field"><label>Other Income (₹)</label><input id="other" type="number" min="0" value="25000"></div>
+<div class="field"><label>80C Deductions (₹)</label><input id="ded80c" type="number" min="0" value="50000"></div>
+<div class="field"><label>Other eligible deductions (₹)</label><input id="dedother" type="number" min="0" value="10000"></div>
+</div>
+<div class="actions"><button class="primary" onclick="calculateITR()">Calculate Practice Tax</button><button class="secondary" onclick="document.querySelector('#itr form')?.reset()">Clear</button></div>
+<div id="itrresult"></div>
+</section>
+
+<section id="gstreg" class="panel">
+<div class="section-title"><h2>GST Registration Practice</h2><span class="hint">Simulated application</span></div>
+<div class="formgrid">
+<div class="field"><label>Legal Business Name</label><input id="biz" placeholder="ABC Traders"></div>
+<div class="field"><label>PAN (sample)</label><input id="gpan" placeholder="ABCDE1234F" maxlength="10"></div>
+<div class="field"><label>Constitution</label><select id="constitution"><option>Proprietorship</option><option>Partnership</option><option>Private Limited Company</option><option>LLP</option></select></div>
+<div class="field"><label>State</label><select id="state"><option>Jharkhand</option><option>Bihar</option><option>West Bengal</option><option>Delhi</option><option>Maharashtra</option><option>Uttar Pradesh</option></select></div>
+<div class="field full"><label>Principal Place of Business</label><textarea id="address" rows="3" placeholder="Sample business address"></textarea></div>
+<div class="field"><label>Mobile</label><input id="mobile" placeholder="9876543210" maxlength="10"></div>
+<div class="field"><label>Email</label><input id="email" type="email" placeholder="sample@example.com"></div>
+<div class="field"><label>Bank Account (sample)</label><input id="bank" placeholder="Practice account number"></div>
+<div class="field"><label>IFSC (sample)</label><input id="ifsc" placeholder="ABCD0123456"></div>
+</div>
+<div class="actions"><button class="primary" onclick="submitGSTPractice()">Generate Practice Application</button></div>
+<div id="gstresult"></div>
+</section>
+
+<section id="gstin" class="panel">
+<div class="section-title"><h2>GSTIN Practice Checker</h2><span class="hint">Format learning tool</span></div>
+<div class="field"><label>Enter a GSTIN</label><input id="gstininput" maxlength="15" placeholder="22AAAAA0000A1Z5" oninput="this.value=this.value.toUpperCase()"></div>
+<div class="actions"><button class="primary" onclick="checkGSTIN()">Check GSTIN</button></div>
+<div id="gstinresult"></div>
+</section>
+
+<section id="invoice" class="panel">
+<div class="section-title"><h2>GST Invoice Simulator</h2><span class="hint">Creates a practice invoice</span></div>
+<div class="formgrid">
+<div class="field"><label>Seller</label><input id="seller" placeholder="ABC Traders"></div>
+<div class="field"><label>Buyer</label><input id="buyer" placeholder="XYZ Stores"></div>
+<div class="field"><label>Item / Service</label><input id="item" placeholder="Consulting Service"></div>
+<div class="field"><label>Quantity</label><input id="qty" type="number" value="1" min="1"></div>
+<div class="field"><label>Rate per unit (₹)</label><input id="rate" type="number" value="10000" min="0"></div>
+<div class="field"><label>GST Rate</label><select id="rategst"><option value="5">5%</option><option value="12">12%</option><option value="18" selected>18%</option><option value="28">28%</option></select></div>
+<div class="field"><label>Supply Type</label><select id="supply"><option value="intra">Intra-state (CGST + SGST)</option><option value="inter">Inter-state (IGST)</option></select></div>
+</div>
+<div class="actions"><button class="primary" onclick="makeInvoice()">Create Invoice</button><button class="secondary" onclick="window.print()">Print / Save as PDF</button></div>
+<div id="invoiceresult"></div>
+</section>
+
+<section id="quiz" class="panel">
+<div class="section-title"><h2>Tax Knowledge Quiz</h2><span class="hint">5 questions</span></div>
+<div id="quizbox"></div><div class="actions"><button class="primary" onclick="submitQuiz()">Submit Quiz</button></div><div id="quizresult"></div>
+</section>
+
+<section id="history" class="panel">
+<div class="section-title"><h2>Practice History</h2><button class="danger" onclick="clearHistory()">Clear</button></div>
+<div id="historybox"></div>
+</section>
+</main>
+<footer>TaxLab India • Educational practice project • No real tax portal connection • No real filing/submission</footer>
+
+<script>
+const KEY='taxlab_india_v1';
+let data=JSON.parse(localStorage.getItem(KEY)||'{"done":{},"score":0,"invoices":0,"gstins":0,"history":[]}');
+function save(){localStorage.setItem(KEY,JSON.stringify(data));updateStats();renderHistory()}
+function showTab(id,btn){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='quiz')renderQuiz();if(id==='history')renderHistory()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function mark(k){data.done[k]=true;save()}
+function updateStats(){let n=Object.keys(data.done).length;document.getElementById('completed').textContent=n;document.getElementById('score').textContent=(data.score||0)+'%';document.getElementById('invoices').textContent=data.invoices||0;document.getElementById('gstins').textContent=data.gstins||0;document.getElementById('bar').style.width=(n/5*100)+'%';[['itr','sitr'],['gstreg','sgst'],['gstin','sgstin'],['invoice','sinvoice'],['quiz','squiz']].forEach(([a,b])=>document.getElementById(b).textContent=data.done[a]?'Completed':'Not started')}
+function log(type,text){data.history.unshift({type,text,date:new Date().toLocaleString()});data.history=data.history.slice(0,30);save()}
+function calculateITR(){
+ let name=document.getElementById('name').value.trim()||'Sample Taxpayer',pan=document.getElementById('pan').value.trim().toUpperCase(),salary=+document.getElementById('salary').value||0,other=+document.getElementById('other').value||0,d80=+document.getElementById('ded80c').value||0,doth=+document.getElementById('dedother').value||0;
+ let panok=/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan),gross=salary+other,deductions=Math.min(d80,150000)+Math.max(0,doth),taxable=Math.max(0,gross-deductions);
+ // Deliberately simplified practice slabs; not a filing calculation.
+ let tax=0;if(taxable>400000){tax+=(Math.min(taxable,800000)-400000)*.05}if(taxable>800000){tax+=(Math.min(taxable,1200000)-800000)*.10}if(taxable>1200000){tax+=(Math.min(taxable,1600000)-1200000)*.15}if(taxable>1600000){tax+=(Math.min(taxable,2000000)-1600000)*.20}if(taxable>2000000)tax+=(taxable-2000000)*.30;tax*=1.04;
+ document.getElementById('itrresult').innerHTML=`<div class="result ${panok?'success':'error'}"><b>${panok?'✓ PAN format looks valid for practice':'✕ PAN format needs 5 letters + 4 digits + 1 letter'}</b><br><br>Taxpayer: ${esc(name)}<br>Gross income: ₹${gross.toLocaleString('en-IN')}<br>Practice deductions: ₹${deductions.toLocaleString('en-IN')}<br><b>Practice taxable income: ₹${taxable.toLocaleString('en-IN')}</b><br><b>Illustrative tax + cess: ₹${Math.round(tax).toLocaleString('en-IN')}</b><br><small>This is a simplified learning calculation, not an actual tax computation.</small></div>`;
+ if(panok){mark('itr');log('ITR','Completed ITR practice for '+name)}
+}
+function submitGSTPractice(){
+ let biz=document.getElementById('biz').value.trim(),pan=document.getElementById('gpan').value.trim().toUpperCase(),mobile=document.getElementById('mobile').value.trim(),email=document.getElementById('email').value.trim();
+ let ok=biz&&/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)&&/^[6-9]\d{9}$/.test(mobile)&&email.includes('@');
+ document.getElementById('gstresult').innerHTML=`<div class="result ${ok?'success':'error'}"><b>${ok?'✓ Practice application ready':'✕ Please complete the highlighted information correctly'}</b><br><br>${ok?`Application ID: PRACTICE-${Date.now().toString().slice(-8)}<br>Business: ${esc(biz)}<br>State: ${esc(document.getElementById('state').value)}<br>Status: <b>SIMULATED / NOT SUBMITTED</b>`:'Required: business name, valid sample PAN format, 10-digit mobile and email.'}</div>`;
+ if(ok){mark('gstreg');log('GST Registration','Generated simulated application for '+biz)}
+}
+function checkGSTIN(){
+ let g=document.getElementById('gstininput').value.trim().toUpperCase(),regex=/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]1Z[0-9A-Z]$/;
+ let state=regex?g.slice(0,2):'—';
+ data.gstins++;save();
+ document.getElementById('gstinresult').innerHTML=`<div class="result ${regex?'success':'error'}"><b>${regex?'✓ GSTIN format matches the expected 15-character pattern':'✕ GSTIN format does not match the expected pattern'}</b><br>${regex?'State code portion: '+state+'<br>Note: this checks format only; it does not verify registration against government records.':'Expected structure: 2-digit state code + PAN-like section + entity/check characters.'}</div>`;
+ if(regex){mark('gstin');log('GSTIN Checker','Checked '+g)}
+}
+function makeInvoice(){
+ let seller=document.getElementById('seller').value.trim()||'Sample Seller',buyer=document.getElementById('buyer').value.trim()||'Sample Buyer',item=document.getElementById('item').value.trim()||'Sample Item',q=+document.getElementById('qty').value||1,r=+document.getElementById('rate').value||0,gr=+document.getElementById('rategst').value||0,s=document.getElementById('supply').value;
+ let sub=q*r,g=sub*gr/100,total=sub+g;
+ let tax=s==='intra'?`CGST ${gr/2}%: ₹${(g/2).toFixed(2)}<br>SGST ${gr/2}%: ₹${(g/2).toFixed(2)}`:`IGST ${gr}%: ₹${g.toFixed(2)}`;
+ data.invoices++;mark('invoice');log('Invoice','Created practice invoice for '+item);
+ document.getElementById('invoiceresult').innerHTML=`<div class="result" id="invoicecard"><h3 style="margin-top:0">TAX INVOICE — PRACTICE</h3><p><b>Seller:</b> ${esc(seller)}<br><b>Buyer:</b> ${esc(buyer)}</p><div class="tablewrap"><table class="table"><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Taxable</th></tr><tr><td>${esc(item)}</td><td>${q}</td><td>₹${r.toFixed(2)}</td><td>₹${sub.toFixed(2)}</td></tr></table></div><p style="text-align:right">${tax}<br><b>Total: ₹${total.toFixed(2)}</b></p><small>Practice invoice only — not a legal tax invoice.</small></div>`;save()
+}
+const qs=[
+['What does ITR generally refer to?',['Income Tax Return','Input Tax Register','Invoice Tax Receipt','Indian Trade Rule'],0],
+['Which identifier is commonly used for an individual taxpayer in India?',['PAN','IFSC','HSN','IEC'],0],
+['GST stands for:',['Goods and Services Tax','General Sales Transfer','Government Service Tariff','Goods Supply Table'],0],
+['For an intra-state GST supply, which taxes are generally charged?',['CGST + SGST','Only IGST','Only CGST','Only SGST'],0],
+['A GSTIN is generally how many characters long?',['10','12','15','18'],2]
+];
+function renderQuiz(){document.getElementById('quizbox').innerHTML=qs.map((q,i)=>`<div class="question"><p>${i+1}. ${q[0]}</p>${q[1].map((x,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${x}</label>`).join('')}</div>`).join('')}
+function submitQuiz(){let correct=0;qs.forEach((q,i)=>{let a=document.querySelector(`input[name=q${i}]:checked`);if(a&&+a.value===q[2])correct++});let score=Math.round(correct/qs.length*100);data.score=score;mark('quiz');log('Quiz','Scored '+score+'% ('+correct+'/'+qs.length+')');document.getElementById('quizresult').innerHTML=`<div class="result ${score>=60?'success':'error'}"><b>Score: ${score}%</b><br>You got ${correct} out of ${qs.length} correct.</div>`;save()}
+function renderHistory(){let h=data.history||[];document.getElementById('historybox').innerHTML=h.length?`<div class="tablewrap"><table class="table"><tr><th>Time</th><th>Activity</th><th>Details</th></tr>${h.map(x=>`<tr><td>${esc(x.date)}</td><td><span class="badge">${esc(x.type)}</span></td><td>${esc(x.text)}</td></tr>`).join('')}</table></div>`:'<p class="hint">No practice activity yet.</p>'}
+function clearHistory(){data.history=[];save()}
+function resetAll(){if(confirm('Reset all TaxLab practice progress?')){localStorage.removeItem(KEY);location.reload()}}
+updateStats();renderHistory();
+</script>
+</body>
+</html>
